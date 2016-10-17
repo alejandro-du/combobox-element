@@ -4,9 +4,11 @@ import com.vaadin.ui.CssLayout;
 import elemental.json.JsonArray;
 import elemental.json.impl.JreJsonFactory;
 
-import java.util.function.Consumer;
-
 public class ComboBoxComponent extends CssLayout {
+
+    public static interface ValueChangeListener {
+        void valueChange(String option);
+    }
 
     private ComboBoxElement element;
 
@@ -15,10 +17,9 @@ public class ComboBoxComponent extends CssLayout {
         element.bindAttribute("value", "change");
         element.setLabel(label);
 
-        JreJsonFactory jsonFactory = new JreJsonFactory();
-        JsonArray array = jsonFactory.createArray();
-
         if (options != null) {
+            JsonArray array = new JreJsonFactory().createArray();
+
             for (int i = 0; i < options.length; i++) {
                 array.set(i, options[i]);
             }
@@ -37,9 +38,9 @@ public class ComboBoxComponent extends CssLayout {
         element.setValue(value);
     }
 
-    public void addValueChangeListener(Consumer<String> listener) {
+    public void addValueChangeListener(ValueChangeListener listener) {
         element.addEventListener("change",
-                args -> listener.accept(getValue()));
+                args -> listener.valueChange(getValue()));
     }
 
 }

@@ -5,8 +5,7 @@ package org.vaadin.elements;
 public interface ComboBoxElement extends Element {
 
     static ComboBoxElement create() {
-        ComboBoxElement element = Elements.create(ComboBoxElement.class);
-        return element;
+        return Elements.create(ComboBoxElement.class);
     }
 
     void setLabel(String label);
