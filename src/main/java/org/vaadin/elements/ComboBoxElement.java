@@ -1,7 +1,5 @@
 package org.vaadin.elements;
 
-import elemental.json.JsonArray;
-
 @Tag("vaadin-combo-box")
 @Import("VAADIN/bower_components/vaadin-combo-box/vaadin-combo-box.html")
 public interface ComboBoxElement extends Element {
