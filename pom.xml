@@ -21,13 +21,13 @@
         <Vaadin-Addon>${project.artifactId}-${project.version}.jar</Vaadin-Addon>
     </properties>
     <scm>
-        <url>git://github.com/your-github-account/combobox-element.git</url>
-        <connection>scm:git:git://github.com/your-github-account/combobox-element.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:/your-github-account/combobox-element.git</developerConnection>
+        <url>https://github.com/alejandro-du/combobox-element.git</url>
+        <connection>scm:git:https://github.com/alejandro-du/combobox-element.git</connection>
+        <developerConnection>scm:git:https://github.com/alejandro-du/combobox-element.git</developerConnection>
     </scm>
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/your-github-account/combobox-element/issues</url>
+        <url>https://github.com/alejandro-du/combobox-element/issues</url>
     </issueManagement>
     <licenses>
         <license>
