@@ -1,9 +1,11 @@
 package org.vaadin.elements;
 
+import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import org.vaadin.addonhelpers.AbstractTest;
 
+@JavaScript("vaadin://bower_components/webcomponentsjs/webcomponents.js")
 public class BasicComboBoxComponentUsageUI extends AbstractTest {
 
     @Override
