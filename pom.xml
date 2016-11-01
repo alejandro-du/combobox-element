@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.vaadin.elements</groupId>
     <artifactId>combobox-element</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>bundle</packaging>
     <organization>
         <name>Vaadin Community</name>
@@ -24,7 +23,8 @@
         <url>https://github.com/alejandro-du/combobox-element.git</url>
         <connection>scm:git:https://github.com/alejandro-du/combobox-element.git</connection>
         <developerConnection>scm:git:https://github.com/alejandro-du/combobox-element.git</developerConnection>
-    </scm>
+      <tag>combobox-element-1.0</tag>
+  </scm>
     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/alejandro-du/combobox-element/issues</url>
