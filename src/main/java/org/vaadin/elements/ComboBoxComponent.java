@@ -1,10 +1,9 @@
 package org.vaadin.elements;
 
-import com.vaadin.ui.CssLayout;
 import elemental.json.JsonArray;
 import elemental.json.impl.JreJsonFactory;
 
-public class ComboBoxComponent extends CssLayout {
+public class ComboBoxComponent extends AbstractElementComponent {
 
     public static interface ValueChangeListener {
         void valueChange(String option);
