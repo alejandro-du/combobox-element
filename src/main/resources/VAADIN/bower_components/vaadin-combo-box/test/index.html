@@ -10,8 +10,11 @@
 
 <body>
   <script>
-    var shadow = document.location.search.indexOf('dom=shadow') > -1;
-    WCT._config.environmentScripts.push(shadow ? 'webcomponentsjs/webcomponents.js' : 'webcomponentsjs/webcomponents-lite.js');
+    WCT._config.environmentScripts.push('iron-test-helpers/mock-interactions.js');
+    WCT._config.environmentScripts.push(location.href.replace(/[^/]+$/, '') + 'mock-touch-interactions.js');
+
+    var edge = window.navigator.userAgent.indexOf('Edge') > -1; // webcomponentsjs/issues/575
+    WCT._config.environmentScripts.push(edge ? 'webcomponentsjs/webcomponents-lite.js' : 'webcomponentsjs/webcomponents.js');
 
     WCT.loadSuites([
       'vaadin-combo-box-properties.html',
@@ -27,8 +30,10 @@
       'data-binding.html',
       'late-upgrade.html',
       'vaadin-combo-box-light.html',
-      'angular2.html'
-    ]);
+      'item-template.html'
+    ].reduce(function(suites, suite) {
+      return suites.concat([suite, suite + '?dom=shadow']);
+    }, []));
   </script>
 </body>
 

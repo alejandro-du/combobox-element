@@ -28,7 +28,6 @@
 
 
 <script>
-  var safari = navigator.userAgent.toLowerCase().indexOf('safari/') > -1 && navigator.userAgent.toLowerCase().indexOf('chrome/') == -1;
   describe('toggling the dropdown', function() {
     var combobox;
     var comboboxLight;
@@ -79,6 +78,16 @@
         combobox.open();
 
         expect(combobox.opened).to.be.true;
+      });
+
+      it('should set body `pointer-events: none` on open and restore initial value on close', function() {
+        document.body.style.pointerEvents = 'painted';
+        combobox.open();
+        expect(getComputedStyle(document.body).pointerEvents).to.be.equal('none');
+        expect(getComputedStyle(combobox).pointerEvents).to.be.equal('auto');
+        expect(getComputedStyle(combobox.$.overlay).pointerEvents).to.be.equal('auto');
+        combobox.close();
+        expect(getComputedStyle(document.body).pointerEvents).to.be.equal('painted');
       });
 
       it('should not close an open popup', function() {
@@ -159,17 +168,20 @@
 
             expect(focusedInput).to.be.null;
           });
-        } else if (!safari) { // TODO: Sauce Labs bug doesn't allow Safari in OS X to focus.
+        } else {
           it('should focus input on dropdown open', function() {
-            var focusedInput = Polymer.dom(combobox.root).querySelector('input:focus');
+            var focusedInput = Polymer.dom(combobox.root).querySelector('input');
+            var activeElement = combobox.root.activeElement || document.activeElement;
+            expect(focusedInput.outerHTML).to.equal(activeElement.outerHTML);
             expect(focusedInput).to.equal(combobox.$.input);
           });
 
           it('should refocus the input field when closed from icon', function() {
             tapToggleIcon();
 
-            var focusedInput = Polymer.dom(combobox.root).querySelector('input:focus');
-
+            var focusedInput = Polymer.dom(combobox.root).querySelector('input');
+            var activeElement = combobox.root.activeElement || document.activeElement;
+            expect(focusedInput.outerHTML).to.equal(activeElement.outerHTML);
             expect(focusedInput).to.eql(combobox.$.input);
           });
         }
@@ -216,6 +228,22 @@
         });
       }
 
+      it('should not close when tapping on the overlay', function() {
+        combobox.open();
+
+        combobox.$.overlay.fire('tap');
+
+        expect(combobox.opened).to.be.true;
+      });
+
+      it('should not close popup when clicking on any overlay children', function() {
+        combobox.open();
+
+        combobox.$.overlay.$.scroller.click();
+
+        expect(combobox.opened).to.be.true;
+      });
+
       it('should close on clicking icon', function() {
         combobox.open();
 
@@ -261,6 +289,10 @@
         expect(getComputedStyle(combobox.$.toggleIcon).display).to.equal('none');
       });
 
+      it('clearIcon should be hidden when disabled', function() {
+        expect(getComputedStyle(combobox.$.clearIcon).display).to.equal('none');
+      });
+
       it('dropdown should not be shown when disabled', function() {
         combobox.$.input.fire('tap');
         expect(combobox.opened).to.be.false;
@@ -275,6 +307,10 @@
 
       it('toggleIcon should be hidden when read-only', function() {
         expect(getComputedStyle(combobox.$.toggleIcon).display).to.equal('none');
+      });
+
+      it('clearIcon should be hidden when read-only', function() {
+        expect(getComputedStyle(combobox.$.clearIcon).display).to.equal('none');
       });
 
       it('dropdown should not be shown when read-only', function() {

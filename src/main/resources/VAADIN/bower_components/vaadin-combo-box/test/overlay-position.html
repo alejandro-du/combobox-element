@@ -70,9 +70,6 @@
       var ev = document.createEvent('Event');
       ev.initEvent('resize', true, true);
       window.dispatchEvent(ev);
-    } else { // Old IE
-      var event = document.createEventObject();
-      element.fireEvent('onresize', event);
     }
   }
 
@@ -89,11 +86,16 @@
   describe('overlay', function() {
     beforeEach(function(done) {
       comboBox = fixture('combobox');
+      var comboBoxRect = comboBox.getBoundingClientRect();
       comboBox.items = getItemArray(20);
 
-      wh = window.innerHeight;
-      ww = window.innerWidth;
-      horiCenter =  ww * 0.5;
+      var win = comboBox.ownerDocument.defaultView;
+      // Subtract the combo-box size from the coordinates range in order not to
+      // move it outside the viewport boundaries when changing top and left.
+      // Otherwise it is not nice for debugging.
+      wh = win.innerHeight - comboBoxRect.height;
+      ww = win.innerWidth - comboBoxRect.width;
+      horiCenter = ww * 0.5;
       vertTop = 0;
       vertBottom = wh;
 
@@ -159,7 +161,7 @@
 
         comboBox.open();
 
-        expect(dropContentRect().left).to.equal(inputContentRect().left);
+        expect(Math.round(dropContentRect().left)).to.equal(Math.round(inputContentRect().left));
 
         expect(dropContentRect().top).to.be.closeTo(inputContentRect().bottom + comboBox.$.overlay.verticalOffset, 1);
       });

@@ -15,7 +15,7 @@
 
 <test-fixture id='combobox'>
   <template>
-    <vaadin-combo-box></vaadin-combo-box>
+    <vaadin-combo-box label="my label"></vaadin-combo-box>
   </template>
 </test-fixture>
 
@@ -27,17 +27,14 @@
     function getInput() {
       return comboBox.$.input;
     }
-    function getLabel() {
-      return comboBox.$.label;
+    function getToggleIcon() {
+      return comboBox.$.toggleIcon;
     }
-    function getSelector() {
-      return comboBox.$.overlay.$.selector;
-    }
-    function getFocusedIndex() {
-      return comboBox._focusedIndex;
+    function getClearIcon() {
+      return comboBox.$.clearIcon;
     }
     function getItemElement(i) {
-      return comboBox.$.overlay.$.selector.querySelectorAll('.item')[i];
+      return comboBox.$.overlay.$.selector.querySelectorAll('vaadin-combo-box-item')[i];
     }
 
     function arrowDown() {
@@ -55,9 +52,12 @@
     describe('when combo-box is attached', function() {
       it('should contain appropriate aria attributes', function() {
         expect(getInput().getAttribute('role')).to.equal('combobox');
-        expect(getInput().getAttribute('aria-labelledby')).to.equal('label');
+        expect(getInput().getAttribute('aria-label')).to.equal('my label');
         expect(getInput().getAttribute('aria-autocomplete')).to.equal('list');
-        expect(getInput().getAttribute('aria-owns')).to.equal('overlay');
+        expect(getToggleIcon().getAttribute('role')).to.equal('button');
+        expect(getToggleIcon().getAttribute('aria-label')).to.equal('Toggle');
+        expect(getClearIcon().getAttribute('role')).to.equal('button');
+        expect(getClearIcon().getAttribute('aria-label')).to.equal('Clear');
       });
     });
 
@@ -72,12 +72,14 @@
 
       it('should set aria-expanded attribute when opened', function() {
         expect(getInput().getAttribute('aria-expanded')).to.equal('true');
+        expect(getToggleIcon().getAttribute('aria-expanded')).to.equal('true');
       });
 
       it('should unset aria-expanded attribute when closed', function() {
         esc();
 
         expect(getInput().getAttribute('aria-expanded')).to.equal('false');
+        expect(getToggleIcon().getAttribute('aria-expanded')).to.equal('false');
       });
     });
 
@@ -87,15 +89,12 @@
       });
 
       it('should set selection aria attributes when focusing an item', function() {
-        getSelector().selectedItem = 'foo';
-        arrowDown();
+        comboBox.value = 'foo';
+        arrowDown(); // 'focus moves to 2nd item'
 
         expect(getItemElement(0).getAttribute('role')).to.equal('option');
-        expect(getItemElement(0).getAttribute('aria-selected')).to.equal('true');
-        expect(getItemElement(1).getAttribute('aria-selected')).to.equal('false');
-        expect(getInput().getAttribute('aria-activedescendant')).to.equal('it0');
-        expect(comboBox.$.overlay.$.selector.getAttribute('data-selection')).to.equal('it0');
-
+        expect(getItemElement(0).getAttribute('aria-selected')).to.equal('false');
+        expect(getItemElement(1).getAttribute('aria-selected')).to.equal('true');
       });
     });
 

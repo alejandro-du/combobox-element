@@ -1,8 +1,10 @@
 package org.vaadin.elements;
 
+import com.vaadin.annotations.HtmlImport;
 import elemental.json.JsonArray;
 import elemental.json.impl.JreJsonFactory;
 
+@HtmlImport("vaadin://bower_components/vaadin-combo-box/vaadin-combo-box.html")
 public class ComboBoxComponent extends AbstractElementComponent {
 
     public static interface ValueChangeListener {

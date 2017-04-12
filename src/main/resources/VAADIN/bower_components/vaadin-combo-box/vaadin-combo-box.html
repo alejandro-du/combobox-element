@@ -30,6 +30,30 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 This element is also extended with the `IronFormElementBehavior` to
 enable usage within an `iron-form`.
 
+### Item Template
+
+`<vaadin-combo-box>` supports using custom item template provided in the light
+DOM:
+
+```html
+<vaadin-combo-box items='[{"label": "Hydrogen", "value": "H"}]'>
+  <template>
+    [[index]]: [[item.label]] <b>[[item.value]</b>
+  </template>
+</vaadin-combo-box>
+```
+
+The following properties are available for item template bindings:
+
+Property name | Type | Description
+--------------|------|------------
+`index`| Number | Index of the item in the `items` array
+`item` | String or Object | The item reference
+`selected` | Boolean | True when item is selected
+`focused` | Boolean | True when item is focused
+
+See the [Item Template Live Demos](demo/item-template.html) for more examples.
+
 ### Styling
 There are custom properties and mixins you can use to style the component:
 
@@ -38,6 +62,7 @@ Custom property | Description | Default
 `--vaadin-combo-box-overlay-max-height` | Property that determines the max height of overlay | `65vh`
 
 @element vaadin-combo-box
+@demo demo/index.html
 -->
 
 <link rel="import" href="../polymer/polymer.html">
@@ -45,6 +70,7 @@ Custom property | Description | Default
 <link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
 <link rel="import" href="../iron-a11y-announcer/iron-a11y-announcer.html">
 <link rel="import" href="../paper-input/paper-input-container.html">
+<link rel="import" href="../paper-input/paper-input-error.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="vaadin-combo-box-behavior.html">
 <link rel="import" href="vaadin-combo-box-overlay.html">
@@ -52,80 +78,80 @@ Custom property | Description | Default
 <link rel="import" href="vaadin-combo-box-icons.html">
 
 <dom-module id="vaadin-combo-box">
-  <style include="vaadin-combo-box-shared-styles">
-    :host {
-       display: block;
-       padding: 8px 0;
-    }
-
-    :host > #overlay {
-      display: none;
-    }
-
-    paper-input-container {
-      position: relative;
-      padding: 0;
-    }
-
-    paper-icon-button.clear-button,
-    paper-icon-button.toggle-button,
-    :host ::content paper-icon-button.clear-button,
-    :host ::content paper-icon-button.toggle-button {
-      position: absolute;
-      bottom: -4px;
-      right: -4px;
-
-      line-height: 18px !important;
-      width: 32px;
-      height: 32px;
-      padding: 4px;
-      text-align: center;
-
-      color: rgba(0, 0, 0, .38);
-      cursor: pointer;
-      margin-top: -1px;
-      --paper-icon-button-ink-color: rgba(0, 0, 0, .54);
-    }
-
-    paper-input-container paper-icon-button.clear-button,
-    paper-input-container ::content paper-icon-button.clear-button {
-      right: 28px;
-    }
-
-    paper-input-container paper-icon-button:hover,
-    paper-input-container ::content paper-icon-button:hover,
-    :host([opened]) paper-input-container paper-icon-button,
-    :host([opened]) paper-input-container ::content paper-icon-button {
-      color: rgba(0, 0, 0, .54);
-    }
-
-    :host([opened]) paper-input-container ::content paper-icon-button:hover,
-    :host([opened]) paper-input-container paper-icon-button:hover {
-      color: rgba(0, 0, 0, .86);
-    }
-
-    :host([opened]) paper-input-container {
-      /* Keep the paper-input-container above the dropdown. */
-      z-index: 20;
-    }
-
-    #input::-ms-clear {
-      display: none;
-    }
-
-    #input {
-      box-sizing: border-box;
-      padding-right: 28px;
-    }
-
-    :host([opened][has-value]) #input {
-      padding-right: 60px;
-      margin-right: -32px;
-    }
-
-  </style>
-
   <template>
+    <style include="vaadin-combo-box-shared-styles">
+      :host {
+        display: block;
+        padding: 8px 0;
+      }
+
+      :host > #overlay {
+        display: none;
+      }
+
+      paper-input-container {
+        position: relative;
+        padding: 0;
+      }
+
+      paper-icon-button.clear-button,
+      paper-icon-button.toggle-button,
+      :host ::content paper-icon-button.clear-button,
+      :host ::content paper-icon-button.toggle-button {
+        position: absolute;
+        bottom: -4px;
+        right: -4px;
+
+        line-height: 18px !important;
+        width: 32px;
+        height: 32px;
+        padding: 4px;
+        text-align: center;
+
+        color: rgba(0, 0, 0, .38);
+        cursor: pointer;
+        margin-top: -1px;
+        --paper-icon-button-ink-color: rgba(0, 0, 0, .54);
+      }
+
+      paper-input-container paper-icon-button.clear-button,
+      paper-input-container ::content paper-icon-button.clear-button {
+        right: 28px;
+      }
+
+      paper-input-container paper-icon-button:hover,
+      paper-input-container ::content paper-icon-button:hover,
+      :host([opened]) paper-input-container paper-icon-button,
+      :host([opened]) paper-input-container ::content paper-icon-button {
+        color: rgba(0, 0, 0, .54);
+      }
+
+      :host([opened]) paper-input-container ::content paper-icon-button:hover,
+      :host([opened]) paper-input-container paper-icon-button:hover {
+        color: rgba(0, 0, 0, .86);
+      }
+
+      :host([opened]) paper-input-container {
+        /* Keep the paper-input-container above the dropdown. */
+        z-index: 20;
+      }
+
+      #input::-ms-clear {
+        display: none;
+      }
+
+      #input {
+        box-sizing: border-box;
+        padding-right: 28px;
+      }
+
+      :host([has-value]) #input {
+        padding-right: 60px;
+        margin-right: -32px;
+      }
+
+    </style>
+
     <paper-input-container
           id="inputContainer"
           disabled$="[[disabled]]"
@@ -145,11 +171,9 @@ Custom property | Description | Default
           autocomplete="off"
           autocapitalize="none"
           bind-value="{{_inputElementValue}}"
-          aria-labelledby="label"
-          aria-activedescendant$="[[_ariaActiveIndex]]"
+          aria-label$="[[label]]"
           aria-expanded$="[[_getAriaExpanded(opened)]]"
           aria-autocomplete="list"
-          aria-owns="overlay"
           disabled$="[[disabled]]"
           invalid="{{invalid}}"
           prevent-invalid-input="[[preventInvalidInput]]"
@@ -173,8 +197,8 @@ Custom property | Description | Default
         <paper-icon-button
             id="clearIcon"
             tabindex="-1"
+            aria-label="Clear"
             icon="vaadin-combo-box:clear"
-            on-down="_preventDefault"
             class="clear-button small">
         </paper-icon-button>
       </content>
@@ -184,8 +208,8 @@ Custom property | Description | Default
             id="toggleIcon"
             tabindex="-1"
             icon="vaadin-combo-box:arrow-drop-down"
-            aria-controls="overlay"
-            on-down="_preventDefault"
+            aria-label="Toggle"
+            aria-expanded$="[[_getAriaExpanded(opened)]]"
             class="toggle-button rotate-on-open">
         </paper-icon-button>
       </content>
@@ -197,11 +221,12 @@ Custom property | Description | Default
 
     <vaadin-combo-box-overlay
         id="overlay"
-        _aria-active-index="{{_ariaActiveIndex}}"
+        opened$=[[opened]]
         position-target="[[_getPositionTarget()]]"
         _focused-index="[[_focusedIndex]]"
         _item-label-path="[[itemLabelPath]]"
         on-down="_onOverlayDown"
+        loading="[[loading]]"
         on-mousedown="_preventDefault"
         vertical-offset="2">
     </vaadin-combo-box-overlay>
@@ -322,8 +347,22 @@ Custom property | Description | Default
 
       size: {
         type: Number
-      }
+      },
 
+      /**
+       * True when the input field has focus.
+       */
+      focused: {
+        type: Boolean,
+        value: false,
+        readOnly: true,
+        reflectToAttribute: true,
+        notify: true
+      }
+    },
+
+    listeners: {
+      'inputContainer.focused-changed': '_onInputContainerFocusedChanged'
     },
 
     attached: function() {
@@ -332,6 +371,11 @@ Custom property | Description | Default
       // Use the default toggle/clear or one replaced in light DOM.
       this._toggleElement = Polymer.dom(this).querySelector('.toggle-button') || this.$.toggleIcon;
       this._clearElement = Polymer.dom(this).querySelector('.clear-button') || this.$.clearIcon;
+      this._preventInputBlur();
+    },
+
+    detached: function() {
+      this._restoreInputBlur();
     },
 
     _computeAlwaysFloatLabel: function(alwaysFloatLabel, placeholder) {
@@ -344,6 +388,24 @@ Custom property | Description | Default
 
     _getAriaExpanded: function(value) {
       return value.toString();
+    },
+
+    /**
+     * Sets focus on the input field.
+     */
+    focus: function() {
+      this.$.input.focus();
+    },
+
+    /**
+     * Removes focus from the input field.
+     */
+    blur: function() {
+      this.$.input.blur();
+    },
+
+    _onInputContainerFocusedChanged: function(e) {
+      this._setFocused(e.detail.value);
     }
   });
 

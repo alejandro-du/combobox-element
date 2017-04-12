@@ -63,6 +63,18 @@
       comboBox.items = ['foo', 'bar', 'baz'];
     });
 
+    afterEach(function(done) {
+      /*
+        The following prevents test errors in MSIE 11.
+
+        The input element is asynchronously prefilled with item label
+        when navigating with keyboard. In IE11, the async callbacks
+        could be called after the test is already done, and the test
+        fixture is destroyed, causing errors.
+      */
+      Polymer.Base.async(done, 1);
+    });
+
     describe('opening the overlay', function() {
       it('should open the overlay with arrow down and not focus any item', function() {
         arrowDown();
@@ -88,8 +100,11 @@
     });
 
     describe('navigating the items after overlay opened', function() {
-      beforeEach(function() {
-        arrowDown();
+      beforeEach(function(done) {
+        comboBox.async(function() {
+          arrowDown();
+          done();
+        });
       });
 
       it('should focus on the first item with arrow down', function() {
@@ -146,9 +161,12 @@
     });
 
     describe('selecting items', function() {
-      beforeEach(function() {
-        comboBox.value = 'bar';
-        arrowDown();
+      beforeEach(function(done) {
+        comboBox.async(function() {
+          comboBox.value = 'bar';
+          arrowDown();
+          done();
+        });
       });
 
       it('should select focused item with enter', function() {
@@ -192,6 +210,34 @@
         expect(comboBox.opened).to.equal(true);
       });
 
+      it('should revert to the custom value after filtering', function() {
+        comboBox.allowCustomValue = true;
+        comboBox.value = 'foobar';
+        filter('bar');
+        esc();
+        expect(getInput().bindValue).to.eql('bar');
+        esc();
+        expect(getInput().bindValue).to.equal('foobar');
+      });
+
+      it('should revert a non-listed value to the custom value after filtering', function() {
+        comboBox.allowCustomValue = true;
+        comboBox.value = 'foobar';
+        filter('barbaz');
+        esc();
+        expect(getInput().bindValue).to.equal('foobar');
+      });
+
+      it('should revert to the custom value after keyboar navigation', function() {
+        comboBox.allowCustomValue = true;
+        comboBox.value = 'foobar';
+        arrowDown();
+        esc();
+        expect(getInput().bindValue).to.eql('foobar');
+        esc();
+        expect(getInput().bindValue).to.equal('foobar');
+      });
+
       it('should close the overlay with enter', function() {
         enter();
 
@@ -231,50 +277,75 @@
         expect(comboBox.value).to.equal('baz');
       });
 
-      it('should prefill the input field when navigating down', function() {
+      it('should reset the input value synchronously when keyboard navigating', function() {
         arrowDown();
 
-        expect(getInput().bindValue).to.eql('baz');
+        expect(getInput().bindValue).to.eql('');
       });
 
-      it('should select the input field text when navigating down', function() {
+      it('should prefill the input field when navigating down', function(done) {
         arrowDown();
 
-        expect(getInput().selectionStart).to.eql(0);
-        expect(getInput().selectionEnd).to.eql(3);
+        comboBox.async(function() {
+          expect(getInput().bindValue).to.eql('baz');
+          done();
+        }, 1);
       });
 
-      it('should prefill the input field when navigating up', function() {
+      it('should select the input field text when navigating down', function(done) {
+        arrowDown();
+
+        comboBox.async(function() {
+          expect(getInput().selectionStart).to.eql(0);
+          expect(getInput().selectionEnd).to.eql(3);
+          done();
+        }, 1);
+      });
+
+      it('should prefill the input field when navigating up', function(done) {
         arrowUp();
 
-        expect(getInput().bindValue).to.eql('foo');
+        comboBox.async(function() {
+          expect(getInput().bindValue).to.eql('foo');
+          done();
+        }, 1);
       });
 
-      it('should not prefill the input when there are no items to navigate', function() {
+      it('should not prefill the input when there are no items to navigate', function(done) {
         filter('invalid filter');
 
         arrowDown();
 
-        expect(getInput().bindValue).to.eql('invalid filter');
+        comboBox.async(function() {
+          expect(getInput().bindValue).to.eql('invalid filter');
+          done();
+        }, 1);
       });
 
-      it('should select the input field text when navigating up', function() {
+      it('should select the input field text when navigating up', function(done) {
         arrowUp();
 
-        expect(getInput().selectionStart).to.eql(0);
-        expect(getInput().selectionEnd).to.eql(3);
+        comboBox.async(function() {
+          expect(getInput().selectionStart).to.eql(0);
+          expect(getInput().selectionEnd).to.eql(3);
+          done();
+        }, 1);
       });
 
-      it('should revert back to filter with espace', function() {
+      it('should revert back to filter with espace', function(done) {
         filter('b');
 
         arrowDown();
 
-        expect(getInput().bindValue).to.eql('bar');
+        comboBox.async(function() {
+          expect(getInput().bindValue).to.eql('bar');
 
-        esc();
+          esc();
 
-        expect(getInput().bindValue).to.eql('b');
+          expect(getInput().bindValue).to.eql('b');
+          done();
+        }, 1);
+
       });
 
       it('should remove selection from the input value when reverting', function() {
@@ -293,19 +364,16 @@
         expect(getInput().bindValue).to.eql('bar');
       });
 
-      // Safari window doesn't have focus in SauceLabs which prevents input fields from focusing also.
-      // iPad and iPhone simulators have the same issue. As a note, touch devices seem to clear the selection
-      // natively when blurring an input.
-      if (!safari && !touchDevice) {
-        it('should remove selection from the input value selecting value', function() {
-          arrowDown();
+      it('should remove selection from the input value selecting value', function() {
+        arrowDown();
 
-          enter();
+        enter();
 
+        comboBox.async(function() {
           expect(getInput().selectionStart).to.eql(3);
           expect(getInput().selectionEnd).to.eql(3);
         });
-      }
+      });
     });
 
     // TODO: these tests are here to prevent possible regressions with using
@@ -318,9 +386,9 @@
 
         Polymer.Base.async(function() {
           expect(comboBox.$.overlay._visibleItemsCount()).to.eql(4);
-          expect(comboBox.$.overlay._lastVisibleIndex()).to.eql(3);
+          expect(comboBox.$.overlay.$.selector.lastVisibleIndex).to.eql(3);
           done();
-        });
+        }, 1);
       });
 
       it('should calculate items correctly when some items are hidden', function(done) {
@@ -334,9 +402,9 @@
         comboBox.open();
 
         Polymer.Base.async(function() {
-          expect(comboBox.$.overlay._lastVisibleIndex()).to.eql(comboBox.$.overlay._visibleItemsCount() - 1);
+          expect(comboBox.$.overlay._visibleItemsCount()).to.eql(comboBox.$.overlay.$.selector.lastVisibleIndex + 1);
           done();
-        });
+        }, 1);
       });
     });
 
@@ -354,7 +422,7 @@
         comboBox.open();
         selector = comboBox.$.overlay.$.selector;
 
-        Polymer.Base.async(done);
+        Polymer.Base.async(done, 1);
       });
 
       it('should scroll down after reaching the last visible item', function() {
