@@ -1,3 +1,6 @@
+[![Published on Vaadin  Directory](https://img.shields.io/badge/Vaadin%20Directory-published-00b4f0.svg)](https://vaadin.com/directory/component/combobox-element)
+[![Stars on vaadin.com/directory](https://img.shields.io/vaadin-directory/star/combobox-element.svg)](https://vaadin.com/directory/component/combobox-element)
+
 # ComboBoxElement Add-on for Vaadin
 
 This is an experimental Vaadin add-on that encapsulates a [vaadin-combo-box](https://vaadin.com/elements/-/element/vaadin-combo-box) HTML element in a Vaadin component.
